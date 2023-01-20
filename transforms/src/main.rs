@@ -43,18 +43,20 @@ fn main() {
         let cube = GeometricPrimitive::new(Box::new(Cube {}));
 
         let transform = {
-            let theta = 2. * PI * (frame % FRAMES_PER_TURN) as f64 / FRAMES_PER_TURN as f64;
+            let pos = (frame % FRAMES_PER_TURN) as f64 / FRAMES_PER_TURN as f64;
+            let theta = 2. * PI * pos;
+            let scaling = 0.7 * (1. - 0.5 * (0.5 - (pos - 0.5).abs()));
 
             if frame < FRAMES_PER_TURN {
                 Transform::new_identity()
                     .add(&Transform::new_z_rotation(theta))
                     .add(&Transform::new_translation(Vect::new(2., 0., 1.)))
-                    .add(&Transform::new_uniform_scaling(0.7))
+                    .add(&Transform::new_uniform_scaling(scaling))
             } else {
                 Transform::new_identity()
                     .add(&Transform::new_translation(Vect::new(2., 0., 1.)))
                     .add(&Transform::new_z_rotation(theta))
-                    .add(&Transform::new_uniform_scaling(0.7))
+                    .add(&Transform::new_uniform_scaling(scaling))
             }
         };
 
