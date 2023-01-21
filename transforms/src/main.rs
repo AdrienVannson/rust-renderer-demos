@@ -1,4 +1,4 @@
-use std::f64::consts::PI;
+use std::{f64::consts::PI, fs::create_dir_all, process::Command};
 
 use renderer::{
     camera::Camera,
@@ -18,9 +18,13 @@ use renderer::{
 const FRAMES_PER_TURN: i32 = 120;
 
 fn main() {
-    let width = 640;
-    let height = 360;
+    //let (width, height) = (640, 360);
+    let (width, height) = (1920, 1080);
 
+    // Create the output directory
+    create_dir_all("output").expect("Can't create output folder");
+
+    // Generate the frames
     for frame in 0..2 * FRAMES_PER_TURN {
         let camera = {
             let pos = Vect::new(-3., -8., 5.);
@@ -45,7 +49,7 @@ fn main() {
         let transform = {
             let pos = (frame % FRAMES_PER_TURN) as f64 / FRAMES_PER_TURN as f64;
             let theta = 2. * PI * pos;
-            let scaling = 0.7 * (1. - 0.5 * (0.5 - (pos - 0.5).abs()));
+            let scaling = 0.7 * (1. - 0.7 * (0.5 - (pos - 0.5).abs()));
 
             if frame < FRAMES_PER_TURN {
                 Transform::new_identity()
@@ -102,4 +106,11 @@ fn main() {
             .save(format!("output/{:04}.png", frame))
             .expect("Could not save the image");
     }
+
+    // Generate the output video
+    Command::new("ffmpeg")
+        .args(["-y", "-framerate", "60", "-i", "%04d.png", "output.mp4"])
+        .current_dir("output")
+        .status()
+        .expect("Can't create video");
 }
