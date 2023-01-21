@@ -15,7 +15,7 @@ use renderer::{
     vect::Vect,
 };
 
-const FRAMES_PER_TURN: i32 = 120;
+const FRAMES_PER_TURN: i32 = 60;
 
 fn main() {
     //let (width, height) = (640, 360);
@@ -64,7 +64,9 @@ fn main() {
                     .add(&Transform::new_uniform_scaling(scaling))
             } else {
                 Transform::new_identity()
+                    .add(&Transform::new_z_rotation(PI / 4.))
                     .add(&Transform::new_scaling(1. + 3. * (0.5 - (pos - 0.5).abs()), 1., 1.))
+                    .add(&Transform::new_z_rotation(PI / 4.))
                     .add(&Transform::new_translation(Vect::new(2., 0., 1.)))
                     .add(&Transform::new_uniform_scaling(0.7))
             }
