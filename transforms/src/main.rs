@@ -25,7 +25,7 @@ fn main() {
     create_dir_all("output").expect("Can't create output folder");
 
     // Generate the frames
-    for frame in 0..2 * FRAMES_PER_TURN {
+    for frame in 0..3 * FRAMES_PER_TURN {
         let camera = {
             let pos = Vect::new(-3., -8., 5.);
             let dir = -2.5 * pos.normalized();
@@ -47,20 +47,26 @@ fn main() {
         let cube = GeometricPrimitive::new(Box::new(Cube {}));
 
         let transform = {
+            let part = frame / FRAMES_PER_TURN;
             let pos = (frame % FRAMES_PER_TURN) as f64 / FRAMES_PER_TURN as f64;
             let theta = 2. * PI * pos;
             let scaling = 0.7 * (1. - 0.7 * (0.5 - (pos - 0.5).abs()));
 
-            if frame < FRAMES_PER_TURN {
+            if part == 0 {
                 Transform::new_identity()
                     .add(&Transform::new_z_rotation(theta))
                     .add(&Transform::new_translation(Vect::new(2., 0., 1.)))
+                    .add(&Transform::new_uniform_scaling(scaling))
+            } else if part == 1 {
+                Transform::new_identity()
+                    .add(&Transform::new_translation(Vect::new(2., 0., 1.)))
+                    .add(&Transform::new_z_rotation(theta))
                     .add(&Transform::new_uniform_scaling(scaling))
             } else {
                 Transform::new_identity()
+                    .add(&Transform::new_scaling(1. + 3. * (0.5 - (pos - 0.5).abs()), 1., 1.))
                     .add(&Transform::new_translation(Vect::new(2., 0., 1.)))
-                    .add(&Transform::new_z_rotation(theta))
-                    .add(&Transform::new_uniform_scaling(scaling))
+                    .add(&Transform::new_uniform_scaling(0.7))
             }
         };
 
