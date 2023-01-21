@@ -6,5 +6,5 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-renderer = { path = "../../renderer" }
+renderer = { git = "https://github.com/AdrienVannson/rust-renderer/", rev = "fed60ce59be268386ab157203791b20d82dd9b9a" }
 image = "0.24.5"
