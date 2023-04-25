@@ -81,6 +81,13 @@ fn main() {
     );
     scene.add_primitive(Box::new(small_cube));
 
+    let light_cube = TransformedPrimitive::new(
+        Box::new(GeometricPrimitive::new(Box::new(Cube {}), Material {color: Color::new(1., 0., 1.)})),
+        Transform::new_uniform_scaling(0.3)
+            .add(&Transform::new_translation(Vect::new(0., 0., 1.2))),
+    );
+    scene.add_primitive(Box::new(light_cube));
+
     // Render
     let renderer = WhittedRayTracer {};
 
