@@ -4,7 +4,7 @@ use renderer::{
     primitives::{GeometricPrimitive, TransformedPrimitive},
     renderers::WhittedRayTracer,
     shapes::implicit_shapes::Cube,
-    Camera, Color, Light, Scene, Transform, Vect,
+    Camera, Color, Light, Material, Scene, Transform, Vect,
 };
 
 fn main() {
@@ -33,38 +33,48 @@ fn main() {
         intensity: 1.,
     });
 
+    let white = Material {
+        color: Color::white(),
+    };
+    let red = Material {
+        color: Color::red(),
+    };
+    let green = Material {
+        color: Color::green(),
+    };
+
     let cube_left = TransformedPrimitive::new(
-        Box::new(GeometricPrimitive::new(Box::new(Cube {}))),
+        Box::new(GeometricPrimitive::new(Box::new(Cube {}), red)),
         Transform::new_translation(Vect::new(0., 2., 0.)),
     );
     scene.add_primitive(Box::new(cube_left));
 
     let cube_right = TransformedPrimitive::new(
-        Box::new(GeometricPrimitive::new(Box::new(Cube {}))),
+        Box::new(GeometricPrimitive::new(Box::new(Cube {}), green)),
         Transform::new_translation(Vect::new(0., -2., 0.)),
     );
     scene.add_primitive(Box::new(cube_right));
 
     let cube_top = TransformedPrimitive::new(
-        Box::new(GeometricPrimitive::new(Box::new(Cube {}))),
+        Box::new(GeometricPrimitive::new(Box::new(Cube {}), white)),
         Transform::new_translation(Vect::new(0., 0., 2.)),
     );
     scene.add_primitive(Box::new(cube_top));
 
     let cube_bottom = TransformedPrimitive::new(
-        Box::new(GeometricPrimitive::new(Box::new(Cube {}))),
+        Box::new(GeometricPrimitive::new(Box::new(Cube {}), white)),
         Transform::new_translation(Vect::new(0., 0., -2.)),
     );
     scene.add_primitive(Box::new(cube_bottom));
 
     let cube_back = TransformedPrimitive::new(
-        Box::new(GeometricPrimitive::new(Box::new(Cube {}))),
+        Box::new(GeometricPrimitive::new(Box::new(Cube {}), white)),
         Transform::new_translation(Vect::new(2., 0., 0.)),
     );
     scene.add_primitive(Box::new(cube_back));
 
     let small_cube = TransformedPrimitive::new(
-        Box::new(GeometricPrimitive::new(Box::new(Cube {}))),
+        Box::new(GeometricPrimitive::new(Box::new(Cube {}), white)),
         Transform::new_scaling(0.3, 0.3, 0.5)
             .add(&Transform::new_translation(Vect::new(0., -0.2, -0.5)))
             .add(&Transform::new_z_rotation(1.)),
