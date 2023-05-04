@@ -2,9 +2,9 @@ use std::fs::create_dir_all;
 
 use renderer::{
     primitives::{GeometricPrimitive, TransformedPrimitive},
-    renderers::WhittedRayTracer,
+    renderers::MonteCarloRenderer,
     shapes::implicit_shapes::Cube,
-    Camera, Color, Light, Material, Scene, Transform, Vect,
+    Camera, Color, Light, Material, Renderer, Scene, Transform, Vect,
 };
 
 fn main() {
@@ -14,19 +14,16 @@ fn main() {
     // Create the output directory
     create_dir_all("output").expect("Can't create output folder");
 
-    // Generate the frames
-    let camera = {
+    let mut scene: Scene = Scene::new({
         let pos = Vect::new(-3., 0., 0.);
-        let dir = -1. * pos.normalized();
+        let dir = Vect::new(1., 0., 0.);
         Camera {
             pos,
             dir,
             width,
             height,
         }
-    };
-
-    let mut scene = Scene::new(camera);
+    });
 
     scene.add_light(Light {
         pos: Vect::new(-1., 0., 0.9),
@@ -84,27 +81,26 @@ fn main() {
     let light_cube = TransformedPrimitive::new(
         Box::new(GeometricPrimitive::new(Box::new(Cube {}), Material {color: Color::new(1., 0., 1.)})),
         Transform::new_uniform_scaling(0.3)
-            .add(&Transform::new_translation(Vect::new(0., 0., 1.2))),
+            .add(&Transform::new_translation(Vect::new(-1., 0., 1.2))),
     );
     scene.add_primitive(Box::new(light_cube));
 
-    // Render
-    let renderer = WhittedRayTracer {};
+    let renderer = MonteCarloRenderer {iterations_per_pixel: 3};
 
-    let img = scene.render(&renderer);
+    let img = renderer.render(scene);
 
     // Write the output image
-    let mut output: image::RgbImage = image::ImageBuffer::new(width, height);
+    let mut output: image::RgbImage = image::ImageBuffer::new(width as u32, height as u32);
 
     for x in 0..width {
         for y in 0..height {
             output.put_pixel(
-                x,
-                height - y - 1,
+                x as u32,
+                (height - y - 1) as u32,
                 image::Rgb([
-                    img[x as usize][y as usize].0,
-                    img[x as usize][y as usize].1,
-                    img[x as usize][y as usize].2,
+                    img[x][y].0,
+                    img[x][y].1,
+                    img[x][y].2,
                 ]),
             );
         }
