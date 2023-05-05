@@ -2,15 +2,20 @@ use std::fs::create_dir_all;
 
 use renderer::{
     primitives::{GeometricPrimitive, TransformedPrimitive},
-    renderers::MonteCarloRenderer,
+    renderers::{MonteCarloRenderer, WhittedRayTracer},
     shapes::implicit_shapes::Cube,
     Camera, Color, Light, Material, Renderer, Scene, Transform, Vect,
 };
 
-fn main() {
-    let (width, height) = (64, 64);
-    //let (width, height) = (1920, 1080);
+// Size of the output image
+static SIZE: usize = 512;
 
+// Select the renderer used:
+// - if false, WhittedRenderer
+// - if true, MonteCarloRenderer
+static USE_MONTE_CARLO: bool = false;
+
+fn main() {
     // Create the output directory
     create_dir_all("output").expect("Can't create output folder");
 
@@ -20,14 +25,9 @@ fn main() {
         Camera {
             pos,
             dir,
-            width,
-            height,
+            width: SIZE,
+            height: SIZE,
         }
-    });
-
-    scene.add_light(Light {
-        pos: Vect::new(-1., 0., 0.9),
-        intensity: 1.,
     });
 
     let white = Material {
@@ -78,14 +78,30 @@ fn main() {
     );
     scene.add_primitive(Box::new(small_cube));
 
-    let light_cube = TransformedPrimitive::new(
-        Box::new(GeometricPrimitive::new(Box::new(Cube {}), Material {color: Color::new(1., 0., 1.)})),
-        Transform::new_uniform_scaling(0.3)
-            .add(&Transform::new_translation(Vect::new(-1., 0., 1.2))),
-    );
-    scene.add_primitive(Box::new(light_cube));
+    let renderer: Box<dyn Renderer> = if USE_MONTE_CARLO {
+        let light_cube = TransformedPrimitive::new(
+            Box::new(GeometricPrimitive::new(
+                Box::new(Cube {}),
+                Material {
+                    color: Color::new(1., 0., 1.),
+                },
+            )),
+            Transform::new_uniform_scaling(0.3)
+                .add(&Transform::new_translation(Vect::new(-1., 0., 1.2))),
+        );
+        scene.add_primitive(Box::new(light_cube));
 
-    let renderer = MonteCarloRenderer {iterations_per_pixel: 100};
+        Box::new(MonteCarloRenderer {
+            iterations_per_pixel: 100,
+        })
+    } else {
+        scene.add_light(Light {
+            pos: Vect::new(-1., 0., 0.9),
+            intensity: 1.,
+        });
+
+        Box::new(WhittedRayTracer {})
+    };
 
     renderer.render(scene);
 }
