@@ -8,7 +8,7 @@ use renderer::{
 };
 
 fn main() {
-    let (width, height) = (512, 512);
+    let (width, height) = (64, 64);
     //let (width, height) = (1920, 1080);
 
     // Create the output directory
@@ -85,28 +85,7 @@ fn main() {
     );
     scene.add_primitive(Box::new(light_cube));
 
-    let renderer = MonteCarloRenderer {iterations_per_pixel: 3};
+    let renderer = MonteCarloRenderer {iterations_per_pixel: 100};
 
-    let img = renderer.render(scene);
-
-    // Write the output image
-    let mut output: image::RgbImage = image::ImageBuffer::new(width as u32, height as u32);
-
-    for x in 0..width {
-        for y in 0..height {
-            output.put_pixel(
-                x as u32,
-                (height - y - 1) as u32,
-                image::Rgb([
-                    img[x][y].0,
-                    img[x][y].1,
-                    img[x][y].2,
-                ]),
-            );
-        }
-    }
-
-    output
-        .save("output/output.png")
-        .expect("Could not save the image");
+    renderer.render(scene);
 }
