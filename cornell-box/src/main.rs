@@ -2,7 +2,7 @@ use std::fs::create_dir_all;
 
 use renderer::{
     primitives::{GeometricPrimitive, TransformedPrimitive},
-    renderers::{MonteCarloRenderer, WhittedRayTracer, monte_carlo_renderer::SamplingMethod},
+    renderers::{monte_carlo_renderer::SamplingMethod, MonteCarloRenderer, WhittedRayTracer},
     shapes::implicit_shapes::Cube,
     Camera, Color, Light, Material, Renderer, Scene, Transform, Vect,
 };
