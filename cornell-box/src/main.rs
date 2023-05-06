@@ -2,7 +2,7 @@ use std::fs::create_dir_all;
 
 use renderer::{
     primitives::{GeometricPrimitive, TransformedPrimitive},
-    renderers::{MonteCarloRenderer, WhittedRayTracer},
+    renderers::{MonteCarloRenderer, WhittedRayTracer, monte_carlo_renderer::SamplingMethod},
     shapes::implicit_shapes::Cube,
     Camera, Color, Light, Material, Renderer, Scene, Transform, Vect,
 };
@@ -14,6 +14,9 @@ static SIZE: usize = 512;
 // - if false, WhittedRenderer
 // - if true, MonteCarloRenderer
 static USE_MONTE_CARLO: bool = false;
+
+// If a Monte Carlo renderer is used, the sampling method
+static SAMPLING_METHOD: SamplingMethod = SamplingMethod::RegularGrid;
 
 fn main() {
     // Create the output directory
@@ -93,6 +96,7 @@ fn main() {
 
         Box::new(MonteCarloRenderer {
             iterations_per_pixel: 100,
+            sampling_method: SAMPLING_METHOD,
         })
     } else {
         scene.add_light(Light {
