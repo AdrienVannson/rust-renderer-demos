@@ -8,15 +8,15 @@ use renderer::{
 };
 
 // Size of the output image
-static SIZE: usize = 512;
+static SIZE: usize = 64;
 
 // Select the renderer used:
 // - if false, WhittedRenderer
 // - if true, MonteCarloRenderer
-static USE_MONTE_CARLO: bool = false;
+static USE_MONTE_CARLO: bool = true;
 
 // If a Monte Carlo renderer is used, the sampling method
-static SAMPLING_METHOD: SamplingMethod = SamplingMethod::RegularGrid;
+static SAMPLING_METHOD: SamplingMethod = SamplingMethod::IndependantSamples;
 
 fn main() {
     // Create the output directory
@@ -44,59 +44,61 @@ fn main() {
     };
 
     let cube_left = TransformedPrimitive::new(
-        Box::new(GeometricPrimitive::new(Box::new(Cube {}), red)),
+        GeometricPrimitive::new(Box::new(Cube {}), red),
         Transform::new_translation(Vect::new(0., 2., 0.)),
     );
-    scene.add_primitive(Box::new(cube_left));
+    scene.add_primitive(cube_left);
 
     let cube_right = TransformedPrimitive::new(
-        Box::new(GeometricPrimitive::new(Box::new(Cube {}), green)),
+        GeometricPrimitive::new(Box::new(Cube {}), green),
         Transform::new_translation(Vect::new(0., -2., 0.)),
     );
-    scene.add_primitive(Box::new(cube_right));
+    scene.add_primitive(cube_right);
 
     let cube_top = TransformedPrimitive::new(
-        Box::new(GeometricPrimitive::new(Box::new(Cube {}), white)),
+        GeometricPrimitive::new(Box::new(Cube {}), white),
         Transform::new_translation(Vect::new(0., 0., 2.)),
     );
-    scene.add_primitive(Box::new(cube_top));
+    scene.add_primitive(cube_top);
 
     let cube_bottom = TransformedPrimitive::new(
-        Box::new(GeometricPrimitive::new(Box::new(Cube {}), white)),
+        GeometricPrimitive::new(Box::new(Cube {}), white),
         Transform::new_translation(Vect::new(0., 0., -2.)),
     );
-    scene.add_primitive(Box::new(cube_bottom));
+    scene.add_primitive(cube_bottom);
 
     let cube_back = TransformedPrimitive::new(
-        Box::new(GeometricPrimitive::new(Box::new(Cube {}), white)),
+        GeometricPrimitive::new(Box::new(Cube {}), white),
         Transform::new_translation(Vect::new(2., 0., 0.)),
     );
-    scene.add_primitive(Box::new(cube_back));
+    scene.add_primitive(cube_back);
 
     let small_cube = TransformedPrimitive::new(
-        Box::new(GeometricPrimitive::new(Box::new(Cube {}), white)),
+        GeometricPrimitive::new(Box::new(Cube {}), white),
         Transform::new_scaling(0.3, 0.3, 0.5)
             .add(&Transform::new_translation(Vect::new(0., -0.2, -0.5)))
             .add(&Transform::new_z_rotation(1.)),
     );
-    scene.add_primitive(Box::new(small_cube));
+    scene.add_primitive(small_cube);
 
     let renderer: Box<dyn Renderer> = if USE_MONTE_CARLO {
         let light_cube = TransformedPrimitive::new(
-            Box::new(GeometricPrimitive::new(
+            GeometricPrimitive::new(
                 Box::new(Cube {}),
                 Material {
                     color: Color::new(1., 0., 1.),
                 },
-            )),
+            ),
             Transform::new_uniform_scaling(0.3)
                 .add(&Transform::new_translation(Vect::new(-1., 0., 1.2))),
         );
-        scene.add_primitive(Box::new(light_cube));
+        scene.add_primitive(light_cube);
 
         Box::new(MonteCarloRenderer {
-            iterations_per_pixel: 100,
+            steps_count: 1,
+            iterations_per_step_count: 1024,
             sampling_method: SAMPLING_METHOD,
+            output_folder: "output".to_string(),
         })
     } else {
         scene.add_light(Light {
